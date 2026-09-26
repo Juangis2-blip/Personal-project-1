@@ -8,14 +8,12 @@ import java.util.ArrayList;
 public class EmployeeManagementSystem {
 
     public static void main(String[] args) {
-        
         SwingUtilities.invokeLater(() -> {
             try {
                 UIManager.setLookAndFeel(
                         UIManager.getSystemLookAndFeelClassName()
                 );
             } catch (Exception ignored) {
-                
             }
 
             EmployeeManagementFrame ventana = new EmployeeManagementFrame();
@@ -62,14 +60,13 @@ class EmployeeManagementFrame extends JFrame {
         JPanel panelTitulo = crearPanelTitulo();
         JPanel panelFormulario = crearPanelFormulario();
         JPanel panelTabla = crearPanelTabla();
+        JPanel panelEstadisticas = crearPanelEstadisticas();
 
-        
         add(panelTitulo, BorderLayout.NORTH);
         add(panelFormulario, BorderLayout.WEST);
         add(panelTabla, BorderLayout.CENTER);
+        add(panelEstadisticas, BorderLayout.SOUTH);
     }
-
-    
 
     private JPanel crearPanelTitulo() {
         JPanel panel = new JPanel();
@@ -90,6 +87,11 @@ class EmployeeManagementFrame extends JFrame {
         panel.add(new JLabel("Departamento:")); panel.add(campoDepartamento);
         panel.add(new JLabel("Puesto:")); panel.add(campoPuesto);
         panel.add(new JLabel("Salario:")); panel.add(campoSalario);
+        
+        JButton botonAgregar = new JButton("Agregar");
+        botonAgregar.addActionListener(e -> agregarEmpleadoManual());
+        panel.add(botonAgregar);
+        
         return panel;
     }
 
@@ -104,26 +106,118 @@ class EmployeeManagementFrame extends JFrame {
         return panel;
     }
 
+    private JPanel crearPanelEstadisticas() {
+        JPanel panel = new JPanel(new GridLayout(1, 4, 10, 10));
+        etiquetaTotalEmpleados = new JLabel("Total Empleados: 0");
+        etiquetaNominaTotal = new JLabel("Nómina Total: $0.00");
+        etiquetaSalarioPromedio = new JLabel("Salario Promedio: $0.00");
+        etiquetaSalarioMayor = new JLabel("Salario Mayor: $0.00");
+
+        panel.add(etiquetaTotalEmpleados);
+        panel.add(etiquetaNominaTotal);
+        panel.add(etiquetaSalarioPromedio);
+        panel.add(etiquetaSalarioMayor);
+        return panel;
+    }
+
+    private void agregarEmpleadoManual() {
+        try {
+            String id = campoId.getText();
+            String nombre = campoNombre.getText();
+            String depto = campoDepartamento.getText();
+            String puesto = campoPuesto.getText();
+            double salario = Double.parseDouble(campoSalario.getText());
+
+            empleados.add(new Employee(id, nombre, depto, puesto, salario));
+            actualizarTabla();
+            actualizarEstadisticas();
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Por favor ingrese un salario válido.");
+        }
+    }
+
     private void cargarEmpleadosDesdeArchivo() {
-       
+        File archivo = new File(ARCHIVO_EMPLEADOS);
+        if (!archivo.exists()) return;
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(archivo), StandardCharsets.UTF_8))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] datos = linea.split(",");
+                if (datos.length == 5) {
+                    String id = datos[0].trim();
+                    String nombre = datos[1].trim();
+                    String depto = datos[2].trim();
+                    String puesto = datos[3].trim();
+                    double salario = Double.parseDouble(datos[4].trim());
+                    empleados.add(new Employee(id, nombre, depto, puesto, salario));
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error al cargar archivo: " + e.getMessage());
+        }
     }
 
     private void actualizarTabla() {
-        
+        modeloTabla.setRowCount(0);
+        for (Employee emp : empleados) {
+            modeloTabla.addRow(new Object[]{
+                emp.getId(),
+                emp.getNombre(),
+                emp.getDepartamento(),
+                emp.getPuesto(),
+                emp.getSalario()
+            });
+        }
     }
 
     private void actualizarEstadisticas() {
-        
+        if (empleados.isEmpty()) {
+            etiquetaTotalEmpleados.setText("Total Empleados: 0");
+            etiquetaNominaTotal.setText("Nómina Total: $0.00");
+            etiquetaSalarioPromedio.setText("Salario Promedio: $0.00");
+            etiquetaSalarioMayor.setText("Salario Mayor: $0.00");
+            return;
+        }
+
+        double nominaTotal = 0;
+        double salarioMayor = 0;
+
+        for (Employee emp : empleados) {
+            double sal = emp.getSalario();
+            nominaTotal += sal;
+            if (sal > salarioMayor) {
+                salarioMayor = sal;
+            }
+        }
+
+        double promedio = nominaTotal / empleados.size();
+
+        etiquetaTotalEmpleados.setText("Total Empleados: " + empleados.size());
+        etiquetaNominaTotal.setText(String.format("Nómina Total: $%.2f", nominaTotal));
+        etiquetaSalarioPromedio.setText(String.format("Salario Promedio: $%.2f", promedio));
+        etiquetaSalarioMayor.setText(String.format("Salario Mayor: $%.2f", salarioMayor));
     }
 }
 
-
 class Employee {
-    private String id;
-    private String nombre;
-    private String departamento;
-    private String puesto;
-    private double salario;
+    private final String id;
+    private final String nombre;
+    private final String departamento;
+    private final String puesto;
+    private final double salario;
 
-    
+    public Employee(String id, String nombre, String departamento, String puesto, double salario) {
+        this.id = id;
+        this.nombre = nombre;
+        this.departamento = departamento;
+        this.puesto = puesto;
+        this.salario = salario;
+    }
+
+    public String getId() { return id; }
+    public String getNombre() { return nombre; }
+    public String getDepartamento() { return departamento; }
+    public String getPuesto() { return puesto; }
+    public double getSalario() { return salario; }
 }
