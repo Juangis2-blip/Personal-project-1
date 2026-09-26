@@ -8,14 +8,14 @@ import java.util.ArrayList;
 public class EmployeeManagementSystem {
 
     public static void main(String[] args) {
-        // Cleaned up typos like SwingU*ilities and ma*n
+        
         SwingUtilities.invokeLater(() -> {
             try {
                 UIManager.setLookAndFeel(
                         UIManager.getSystemLookAndFeelClassName()
                 );
             } catch (Exception ignored) {
-                // Ignore LookAndFeel configuration errors
+                
             }
 
             EmployeeManagementFrame ventana = new EmployeeManagementFrame();
@@ -63,13 +63,13 @@ class EmployeeManagementFrame extends JFrame {
         JPanel panelFormulario = crearPanelFormulario();
         JPanel panelTabla = crearPanelTabla();
 
-        // Add panels to the main frame layout here (e.g., NORTH, WEST, CENTER)
+        
         add(panelTitulo, BorderLayout.NORTH);
         add(panelFormulario, BorderLayout.WEST);
         add(panelTabla, BorderLayout.CENTER);
     }
 
-    // --- Placeholders for your missing methods to allow successful compilation ---
+    
 
     private JPanel crearPanelTitulo() {
         JPanel panel = new JPanel();
@@ -105,19 +105,19 @@ class EmployeeManagementFrame extends JFrame {
     }
 
     private void cargarEmpleadosDesdeArchivo() {
-        // Implement CSV reading logic here
+       
     }
 
     private void actualizarTabla() {
-        // Implement logic to update JTable rows from the ArrayList
+        
     }
 
     private void actualizarEstadisticas() {
-        // Implement calculation math for total, average, and highest salary
+        
     }
 }
 
-// Basic Employee entity class so that the main frame has a valid type reference
+
 class Employee {
     private String id;
     private String nombre;
@@ -125,5 +125,5 @@ class Employee {
     private String puesto;
     private double salario;
 
-    // Add constructors, getters, and setters as needed
+    
 }
