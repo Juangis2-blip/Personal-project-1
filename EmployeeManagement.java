@@ -18,8 +18,7 @@ public class EmployeeManagement*ystem {
                *        UIManager.getSystemLookAnd*eelClassName()
                 );
 *           } catch (Exception igno*ed) {
-                // Si no se *uede aplicar el estilo del sistema*
-                // Java utilizará*el estilo predeterminado.
+                
         *   }
 
             EmployeeManageme*tFrame ventana =
